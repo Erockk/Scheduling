@@ -1,0 +1,168 @@
+#include <stdlib.h> 
+#include <stdio.h>
+#define Max_size 50
+struct schedule
+{
+
+        int Rtime[Max_size];
+        int Stime[Max_size];
+        int Atime[Max_size];
+	int sjf_aTime[Max_size];
+};
+
+
+void fserve(int size, struct schedule *sch)
+{
+
+        double t = 0;
+        int total = 0;
+        int i = 0;
+        int j = 0;
+	double avWait = 0;
+	double trnAround = 0;
+	for (i; i < size; i++)
+	{
+		if (i == 0)
+		{
+			sch->Atime[i] = 0; //
+		//	cout << s.Atime[i] << '\n';
+			total = sch->Stime[i] + sch->Rtime[i];
+	
+		}
+		else
+		{
+			if(total < sch->Stime[i])
+			{
+				total = sch->Stime[i];
+				sch->Atime[i] = 0;
+				sch->Atime[i] = total - sch->Stime[i];
+				total += sch->Rtime[i];
+			}
+			else
+			{
+				sch->Atime[i] = total - sch->Stime[i];
+				total += sch->Rtime[i];
+			}
+	// cout << s.Atime[i] << '\n';
+		}
+	}
+	for (j; j < size; j++)
+	{ 
+		avWait += sch->Atime[j];
+		trnAround += sch->Atime[j] + sch->Rtime[j];
+	}
+         printf("First Come First Serve: \n");
+	printf("Average Resp: %f Average Wait: %f ",  avWait / size, avWait / size);
+	printf("Average T.A.: %f\n",  trnAround /size);
+
+	
+}
+void sjf(int size, struct schedule *sjf)
+{
+	int k = 0;
+	double avWait = 0;
+	double trnAround = 0;
+	int total = 0;
+	int i = 1;
+	int j = 1;
+	int temp1 = 0;
+	int temp2 = 0;
+
+	for (i; i < size - 1; i++) // sorts burst time in ascending order
+	{
+		j = i;
+		for (j; j < size; j++)
+		{
+			if (sjf->Rtime[i] > sjf->Rtime[j + 1] && sjf->Rtime[j + 1] > 0)
+			{
+				temp1 = sjf->Rtime[i];
+				sjf->Rtime[i] = sjf->Rtime[j + 1];
+				sjf->Rtime[j + 1] = temp1;
+
+				temp2 = sjf->Stime[i];
+				sjf->Stime[i] = sjf->Stime[j + 1];
+				sjf->Stime[j + 1] = temp2;
+
+			}
+		}	
+	//		printf("%d ", sjf->Stime[i]);
+	//	printf("%d \n", sjf->Rtime[i]);
+	}
+	
+	j = 0;
+	for (k; k < size; k++) // Finding, Average time and turnaround time
+	{
+		if (k == 0)
+		{
+			sjf->sjf_aTime[k] = 0; //
+							   //      cout << s.Atime[i] << '\n';
+			total = sjf->Stime[k] + sjf->Rtime[k];
+
+		}
+		else
+		{
+			if (total < sjf->Stime[k])
+			{
+				total = sjf->Stime[k];
+				sjf->sjf_aTime[k] = 0;
+				sjf->sjf_aTime[k] = total - sjf->Stime[k];
+				total += sjf->Rtime[k];
+			}
+			else
+			{
+				sjf->sjf_aTime[k] = total - sjf->Stime[k];
+				total += sjf->Rtime[k];
+			}
+		//	printf("%d \n", sjf->sjf_aTime[k]);
+		}
+	}
+	for (j; j < size; j++)
+	{
+		avWait += sjf->sjf_aTime[j];
+
+		trnAround += sjf->sjf_aTime[j] + sjf->Rtime[j];
+
+	}
+	 printf("SJF: \n");
+        printf("Average Resp: %f Average Wait: %f ",  avWait / size, avWait / size);
+        printf("Average T.A.: %f\n",  trnAround /size);
+
+}
+
+
+
+
+int main(int argc, char *argv[])
+{
+int num1 = 0;
+int num2 = 0;
+struct schedule s;
+int j = 0;
+int size = 0;
+
+
+while(fscanf(stdin, "%d %d", &num1, &num2) == 2)
+{
+
+s.Stime[size] = num1;
+s.Rtime[size] = num2;
+size++;
+
+}
+
+
+s.Stime[size + 1] = -1;
+s.Rtime[size + 1] = -1;
+/*
+for(j; j < size; j++)
+{
+printf("%d ", s.Stime[j]);
+printf("%d\n", s.Rtime[j]);
+}
+*/
+fserve(size, &s);
+printf("\n");
+sjf(size, &s);
+printf("\n");
+}
+
